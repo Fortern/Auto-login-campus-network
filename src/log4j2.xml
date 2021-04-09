@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 跟标签中 status：用来指定日志输出级别。-->
+<Configuration status="INFO">
+    <!--全局参数-->
+    <Properties>
+        <!-- 定义一些常量，之后用${常量名}引用 -->
+        <Property name="pattern">%-d{yyyy-MM-dd HH:mm:ss} [%t] [%c] [%p] - %m%n</Property>
+        <Property name="logDir">E:/文档/log</Property>
+    </Properties>
+
+    <Loggers>
+        <!-- Root：指定项目的根日志，如果没有单独指定 Logger，那么默认使用该 Root 日志输出。 -->
+        <Root level="INFO">
+            <!-- AppenderRef：Root 的子节点，用来指定该日志输出到哪个 Appender。 -->
+            <AppenderRef ref="console"/>
+            <AppenderRef ref="rolling_file"/>
+        </Root>
+        <!-- Logger节点用来单独指定某包下或某类日志输出级别。 -->
+    </Loggers>
+
+    <Appenders>
+        <!-- Console节点 定义输出到控制台 -->
+        <Console name="console" target="SYSTEM_OUT" follow="true">
+            <!--控制台只输出level及以上级别的信息-->
+            <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout>
+                <Pattern>${pattern}</Pattern>
+            </PatternLayout>
+        </Console>
+        <!-- 同一来源的Appender可以定义多个RollingFile，定义按天存储日志 -->
+        <!-- name：Appender 名字。
+             fileName：输出日志文件的名字（带全路径）。
+             filePattern：归档日志文件的文件名模式。-->
+        <RollingFile name="rolling_file"
+                     fileName="${logDir}/latest.log"
+                     filePattern="${logDir}/loginCN_%d{yyyy-MM-dd}.log">
+            <!--ThresholdFilter :日志输出过滤-->
+            <!--level="info" :日志级别,onMatch="ACCEPT" :级别在info之上则接受,onMismatch="DENY" :级别在info之下则拒绝-->
+            <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout>
+                <Pattern>${pattern}</Pattern>
+            </PatternLayout>
+            <Policies>
+                <!-- TimeBasedTriggeringPolicy :时间滚动策略,默认0点小时产生新的文件
+                     interval="x" 每隔x小时产生新文件
+                     modulate="true"
+                     产生文件是否以0点偏移时间,即6点,12点,18点,0点-->
+                <TimeBasedTriggeringPolicy modulate="true"/>
+                <!-- SizeBasedTriggeringPolicy :文件大小滚动策略-->
+                <SizeBasedTriggeringPolicy size="100 MB"/>
+            </Policies>
+            <!-- 日志保留策略，配置只保留七天 -->
+            <DefaultRolloverStrategy>
+                <Delete basePath="${logDir}/" maxDepth="1">
+                    <IfFileName glob="loginCN_*.log" />
+                    <IfLastModified age="3d" />
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+    </Appenders>
+
+</Configuration>
