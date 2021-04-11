@@ -5,7 +5,7 @@
     <Properties>
         <!-- 定义一些常量，之后用${常量名}引用 -->
         <Property name="pattern">%-d{yyyy-MM-dd HH:mm:ss} [%t] [%c] [%p] - %m%n</Property>
-        <Property name="logDir">E:/文档/log</Property>
+        <Property name="logDir">log</Property>
     </Properties>
 
     <Loggers>
