@@ -31,6 +31,7 @@
         <!-- name：Appender 名字。
              fileName：输出日志文件的名字（带全路径）。
              filePattern：归档日志文件的文件名模式。-->
+        <!-- 在开发环境下，日志输出到项目下；在运行环境下，日志输出到与jar程序同级文件夹下 -->
         <RollingFile name="rolling_file"
                      fileName="${logDir}/latest.log"
                      filePattern="${logDir}/loginCN_%d{yyyy-MM-dd}.log">
@@ -49,14 +50,14 @@
                 <!-- SizeBasedTriggeringPolicy :文件大小滚动策略-->
                 <SizeBasedTriggeringPolicy size="100 MB"/>
             </Policies>
-            <!-- 日志保留策略，配置只保留七天 -->
+            <!-- 日志保留策略 -->
             <DefaultRolloverStrategy>
                 <Delete basePath="${logDir}/" maxDepth="1">
                     <IfFileName glob="loginCN_*.log" />
+                    <!-- 配置只保留七天 -->
                     <IfLastModified age="3d" />
                 </Delete>
             </DefaultRolloverStrategy>
         </RollingFile>
     </Appenders>
-
 </Configuration>
