@@ -15,6 +15,7 @@ import java.net.SocketException;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
+import java.util.Objects;
 
 public class LoginCN {
 	private static final Logger log = LogManager.getLogger(LoginCN.class);
@@ -119,7 +120,7 @@ public class LoginCN {
 		String isp = null;
 		try {
 			//jar中的文件，只能以流的方式读取
-			BufferedReader reader = new BufferedReader(new InputStreamReader(LoginCN.class.getClassLoader().getResourceAsStream("user.txt")));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(LoginCN.class.getClassLoader().getResourceAsStream("user.txt"))));
 			account = reader.readLine();
 			password = reader.readLine();
 			switch(reader.readLine()) {
@@ -131,8 +132,8 @@ public class LoginCN {
 			e.printStackTrace();
 			System.exit(0);
 		}
-		String url = "http://172.28.0.22:801/eportal/?c=Portal&a=login&callback=dr1004&login_method=1&user_account=" +
-				account + isp + "&user_password=" + password + "&wlan_user_ip=";
+		StringBuilder url = new StringBuilder("http://172.28.0.22:801/eportal/?c=Portal&a=login&callback=dr1004&login_method=1&user_account=")
+				.append(account).append(isp).append("&user_password=").append(password).append("&wlan_user_ip=");
 		while(true){
 			log.info("尝试获取ip地址");
 			String ip = getRealIP();
