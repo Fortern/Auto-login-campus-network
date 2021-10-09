@@ -8,24 +8,18 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.ConnectException;
 import java.net.URL;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
-import java.util.Enumeration;
 import java.util.Objects;
 
 public class LoginCN {
 	private static final Logger log = LogManager.getLogger(LoginCN.class);
 
-	//登录校园网
-	public static String login(String urlWithParam) {
+	//获取一个请求的响应体
+	private static String getResponse(String url) {
 		StringBuilder result = new StringBuilder();
 		try {
-			URL realUrl = new URL(urlWithParam);
-			URLConnection conn = realUrl.openConnection();
+			URLConnection conn = new URL(url).openConnection();
 			conn.setRequestProperty("accept", "*/*");
 			conn.setRequestProperty("connection", "Keep-Alive");
 			conn.setRequestProperty("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1");
@@ -36,11 +30,17 @@ public class LoginCN {
 				result.append(line).append("\n");
 			result.deleteCharAt(result.length()-1);//删除最后一个换行符
 			return result.toString();
-		} catch (ConnectException e) {
-			log.error("连接超时，请检查是否连接到校园网");
-		} catch (Exception e) {
+		} catch (ConnectException e ){
+			log.error("连接超时，可能未连接至校园网！");
+		} catch (IOException e) {
+			log.error("IO错误！");
 			e.printStackTrace();
 		}
+		return null;
+	}
+
+	//登录校园网
+	public static String login(String urlWithParam) {
 		/*
 		  登录成功时的响应体:(以换行符为开头)
 		  dr1004({"result":"1","msg":"\u8ba4\u8bc1\u6210\u529f"})
@@ -51,41 +51,18 @@ public class LoginCN {
 		  密码错误:
 		  dr1004({"result":"0","msg":"dXNlcmlkIGVycm9yMg==","ret_code":1})
 		 */
-		return null;
+		return getResponse(urlWithParam);
 	}
 	//获取局域网IP地址
 	public static String getRealIP() {
-		try {
-			//获取到所有的网卡
-			Enumeration<NetworkInterface> allNetInterfaces = NetworkInterface.getNetworkInterfaces();
-			while (allNetInterfaces.hasMoreElements()) {
-				NetworkInterface netInterface = allNetInterfaces.nextElement();
-				// 去除回环接口127.0.0.1，子接口，未运行的接口
-				if (netInterface.isLoopback() || netInterface.isVirtual() || !netInterface.isUp()) {
-					continue;
-				}
-				//获取名称中是否包含 Intel Realtek 的网卡
-				if (!netInterface.getDisplayName().contains("Intel")
-						&& !netInterface.getDisplayName().contains("Realtek")
-						&& !netInterface.getDisplayName().contains("Atheros")
-						&& !netInterface.getDisplayName().contains("Broadcom")) {
-					continue;
-				}
-				log.info("DisplayName: " + netInterface.getDisplayName());
-				Enumeration<InetAddress> addresses = netInterface.getInetAddresses();
-				while (addresses.hasMoreElements()) {
-					InetAddress ip = addresses.nextElement();
-					if (ip instanceof Inet4Address) {
-						log.info("HostAddress: " + ip.getHostAddress());
-						return ip.getHostAddress();
-					}
-				}
-				break;
-			}
-		} catch (SocketException e) {
-			e.printStackTrace();
+		String result = getResponse("http://172.28.0.22/drcom/chkstatus?callback=dr1002");
+		if(result == null){
+			return null;
 		}
-		return null;
+		//,"v46ip":"10.130.76.243",
+		int begin = result.indexOf("\"v46ip\"") + 8;
+		begin = result.indexOf("\"",begin) + 1;
+		return result.substring(begin, result.indexOf("\"",begin));
 	}
 	//检测网络连接
 	public static boolean isConnect(){
@@ -147,6 +124,7 @@ public class LoginCN {
 				}
 				continue;
 			}
+			log.info("IP地址为：" + ip);
 			log.info("尝试发送登录请求");
 			String result = login(url + ip);
 			if(result == null){
