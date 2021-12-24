@@ -30,3 +30,4 @@ log_home
 # idea部分文件
 .idea/inspectionProfiles/
 .idea/codeStyles
+.idea/workspace.xml
