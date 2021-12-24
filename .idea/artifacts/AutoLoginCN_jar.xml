@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="AutoLoginCN:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/AutoLoginCN_jar</output-path>
+    <root id="archive" name="AutoLoginCN.jar">
+      <element id="module-output" name="AutoLoginCN" />
+      <element id="extracted-dir" path="D:/Developer/Apache Log4j/apache-log4j-2.14.1-bin/log4j-core-2.14.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="D:/Developer/Apache Log4j/apache-log4j-2.14.1-bin/log4j-api-2.14.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="D:/Developer/Apache Commons Logging/commons-logging-1.2/commons-logging-1.2.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
